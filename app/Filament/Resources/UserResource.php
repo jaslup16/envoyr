@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enums\UserRole;
+use App\Filament\Resources\OfficeResource\RelationManagers\UsersRelationManager;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\Office;
 use App\Models\Section;
@@ -14,6 +15,7 @@ use Filament\Pages\Page;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -168,14 +170,6 @@ class UserResource extends Resource
                         true: fn ($query) => $query->whereNull('deactivated_at'),
                         false: fn ($query) => $query->whereNotNull('deactivated_at'),
                     ),
-                Tables\Filters\TernaryFilter::make('approved_at')
-                    ->label('Approved')
-                    ->trueLabel('Approved')
-                    ->falseLabel('Pending')
-                    ->queries(
-                        true: fn ($query) => $query->whereNotNull('approved_at'),
-                        false: fn ($query) => $query->whereNull('approved_at'),
-                    ),
                 Tables\Filters\TrashedFilter::make('trashed')
                     ->label('Trashed'),
             ])
@@ -194,6 +188,7 @@ class UserResource extends Resource
                             ->success()
                             ->send();
                     }),
+                ViewAction::make(),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\Action::make('deactivate')
@@ -228,6 +223,7 @@ class UserResource extends Resource
         return [
             'index' => Pages\ListUsers::route('/'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
+            'view' => Pages\ViewUser::route('/{record}'),
         ];
     }
 
